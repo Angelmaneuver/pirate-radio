@@ -1,0 +1,49 @@
+#EXTM3U
+
+#EXTINF:-1,TBSラジオ
+http://localhost:8888/radiko?sid=TBS
+
+#EXTINF:-1,文化放送
+http://localhost:8888/radiko?sid=QRR
+
+#EXTINF:-1,ニッポン放送
+http://localhost:8888/radiko?sid=LFR
+
+#EXTINF:-1,ラジオNIKKEI第1
+http://localhost:8888/radiko?sid=RN1
+
+#EXTINF:-1,ラジオNIKKEI第2
+http://localhost:8888/radiko?sid=RN2
+
+#EXTINF:-1,interfm
+http://localhost:8888/radiko?sid=INT
+
+#EXTINF:-1,TOKYO FM
+http://localhost:8888/radiko?sid=FMT
+
+#EXTINF:-1,J-WAVE
+http://localhost:8888/radiko?sid=FMJ
+
+#EXTINF:-1,ラジオ日本
+http://localhost:8888/radiko?sid=JORF
+
+#EXTINF:-1,bayfm78
+http://localhost:8888/radiko?sid=BAYFM78
+
+#EXTINF:-1,NACK5
+http://localhost:8888/radiko?sid=NACK5
+
+#EXTINF:-1,FMヨコハマ
+http://localhost:8888/radiko?sid=YFM
+
+#EXTINF:-1,LuckyFM 茨城放送
+http://localhost:8888/radiko?sid=IBS
+
+#EXTINF:-1,放送大学
+http://localhost:8888/radiko?sid=HOUSOU-DAIGAKU
+
+#EXTINF:-1,NHKラジオ第1 (東京)
+http://localhost:8888/radiko?sid=JOAK
+
+#EXTINF:-1,NHK-FM (東京)
+http://localhost:8888/radiko?sid=JOAK-FM
