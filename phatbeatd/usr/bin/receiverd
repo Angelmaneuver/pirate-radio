@@ -36,7 +36,8 @@ def radiko() -> Response:
     )
 
     return Response(
-        __streaming(streams[option['stream']].open()),
+        response=__streaming(streams[option['stream']].open()),
+        mimetype='audio/mpeg' if isDebug() else None,
     )
 
 
@@ -56,6 +57,10 @@ def __streaming(fd: StreamIO):
             chunk = fd.read(BUFF_SIZE)
 
             yield chunk
+
+
+def isDebug():
+    return app.config['DEBUG']
 
 
 def main() -> None:
