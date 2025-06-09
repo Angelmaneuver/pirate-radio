@@ -107,6 +107,7 @@ progress() {
     done
     echo
 }
+
 sudocheck() {
     if [ $(id -u) -ne 0 ]; then
         echo -e "Install must be run as root. Try 'sudo ./$scriptname'\n"
@@ -201,6 +202,9 @@ raspbian_check() {
     if [ -f /etc/os-release ]; then
         if cat /etc/os-release | grep -q "/sid"; then
             IS_SUPPORTED=false && IS_EXPERIMENTAL=true
+        elif cat /etc/os-release | grep -q "bookworm"; then
+            IS_SUPPORTED=true && IS_EXPERIMENTAL=false
+            pkgdeplist=${pkgdeplist_buster[@]}
         elif cat /etc/os-release | grep -q "bullseye"; then
             IS_SUPPORTED=true && IS_EXPERIMENTAL=false
             pkgdeplist=${pkgdeplist_buster[@]}
