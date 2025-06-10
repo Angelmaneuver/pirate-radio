@@ -41,9 +41,9 @@ oswarning=() # list experimental os-releases
 osdeny=( "Darwin" "Debian" "Kali" "Kano" "Mate" "PiTop" "RetroPie" "Ubuntu" "Volumio" ) # list os-releases specifically disallowed
 pkgdeplist=( "vlc-nox" ) # list of dependencies
 pkgdeplist_buster=( "vlc-bin" "vlc-plugin-base" ) # vlc-nox not in buster
-pkgdeplist_bookworm=( "vlc-bin" "vlc-plugin-base" "python3-phatbeat" "python3-flask" "python3-streamlink" ) # pip install not available in bookworm
+# pkgdeplist_bookworm=( "vlc-bin" "vlc-plugin-base" "python3-phatbeat" "python3-flask" "python3-streamlink" ) # pip install not available in bookworm
 pipdeplist=( "streamlink" "flask" ) # list of python package dependencies
-pipdeplist_bookworm=()
+# pipdeplist_bookworm=()
 
 FORCE=$1
 ASK_TO_REBOOT=false
@@ -204,10 +204,10 @@ raspbian_check() {
     if [ -f /etc/os-release ]; then
         if cat /etc/os-release | grep -q "/sid"; then
             IS_SUPPORTED=false && IS_EXPERIMENTAL=true
-        elif cat /etc/os-release | grep -q "bookworm"; then
-            IS_SUPPORTED=true && IS_EXPERIMENTAL=false
-            pkgdeplist=${pkgdeplist_bookworm[@]}
-            pipdeplist=${pipdeplist_bookworm[@]}
+        # elif cat /etc/os-release | grep -q "bookworm"; then
+        #     IS_SUPPORTED=true && IS_EXPERIMENTAL=false
+        #     pkgdeplist=${pkgdeplist_bookworm[@]}
+        #     pipdeplist=${pipdeplist_bookworm[@]}
         elif cat /etc/os-release | grep -q "bullseye"; then
             IS_SUPPORTED=true && IS_EXPERIMENTAL=false
             pkgdeplist=${pkgdeplist_buster[@]}
