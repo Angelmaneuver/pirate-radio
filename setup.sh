@@ -244,7 +244,7 @@ apt_pkg_install() {
 }
 
 pip_req() {
-    PIP_CHK=$(pip show "$1" 2> /dev/null | grep "not found")
+    PIP_CHK=$(pip show "$1" | grep "not found")
 
     if [ "" == "$PIP_CHK" ]; then
         echo "$1 is already installed"
