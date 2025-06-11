@@ -39,8 +39,8 @@ raspbianonly="no" # whether the script is allowed to run on other OSes
 osreleases=( "Raspbian" ) # list os-releases supported
 oswarning=() # list experimental os-releases
 osdeny=( "Darwin" "Debian" "Kali" "Kano" "Mate" "PiTop" "RetroPie" "Ubuntu" "Volumio" ) # list os-releases specifically disallowed
-pkgdeplist=( "vlc-nox" ) # list of dependencies
-pkgdeplist_buster=( "vlc-bin" "vlc-plugin-base" ) # vlc-nox not in buster
+pkgdeplist=( "vlc-nox" "libxslt1.1" ) # list of dependencies
+pkgdeplist_buster=( "vlc-bin" "vlc-plugin-base" "libxslt1.1" ) # vlc-nox not in buster
 # pkgdeplist_bookworm=( "vlc-bin" "vlc-plugin-base" "python3-phatbeat" "python3-flask" "python3-streamlink" ) # pip install not available in bookworm
 pipdeplist=( "streamlink" "flask" ) # list of python package dependencies
 # pipdeplist_bookworm=()
@@ -244,7 +244,7 @@ apt_pkg_install() {
 }
 
 pip_req() {
-    PIP_CHK=$(pip show "$1" 2>&1 | grep "not found")
+    PIP_CHK=$(sudo pip show "$1" 2>&1 | grep "not found")
 
     if [ "" == "$PIP_CHK" ]; then
         echo "$1 is already installed"
@@ -257,7 +257,7 @@ pip_req() {
 
 pip_install() {
     echo "Installing $1..."
-    pip install "$1" 1> /dev/null || { inform "PIP failed to install $1!\nFalling back on pypi..." && return 1; }
+    sudo pip install "$1" 1> /dev/null || { inform "PIP failed to install $1!\nFalling back on pypi..." && return 1; }
 }
 
 : <<'MAINSTART'
