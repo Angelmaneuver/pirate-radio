@@ -44,7 +44,7 @@ If a prompts you to restart, restart the system.
 
 Merge the contents of the `Pimoroni` folder in this repository into `/home/pi/Pimoroni`.
 
-Next, run `setup.sh`
+Next, run `setup.sh`.
 
 ```sh
 cd Pimoroni/phatbeat/projects/vlc-radio/
