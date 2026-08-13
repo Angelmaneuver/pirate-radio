@@ -15,14 +15,14 @@ This script is licensed under the terms of the MIT license.
 Unless otherwise noted, code reproduced herein
 was written for this script.
 
-- Angelmaneuver -
+- The Pimoroni Crew -
 
 DISCLAIMER
 
 # script control variables
 
 productname="VLC Radio" # the name of the product to install
-scriptname="setup.sh" # the name of this script
+scriptname="vlcradio-setup.sh" # the name of this script
 spacereq=200 # minimum size required on root partition in MB
 debugmode="no" # whether the script should use debug routines
 debuguser="none" # optional test git user to use in debug mode
@@ -39,11 +39,8 @@ raspbianonly="no" # whether the script is allowed to run on other OSes
 osreleases=( "Raspbian" ) # list os-releases supported
 oswarning=() # list experimental os-releases
 osdeny=( "Darwin" "Debian" "Kali" "Kano" "Mate" "PiTop" "RetroPie" "Ubuntu" "Volumio" ) # list os-releases specifically disallowed
-pkgdeplist=( "vlc-nox" "libxslt1.1" ) # list of dependencies
-pkgdeplist_buster=( "vlc" "vlc-bin" "vlc-plugin-base" "libxslt1.1" ) # vlc-nox not in buster
-# pkgdeplist_bookworm=( "vlc-bin" "vlc-plugin-base" "python3-phatbeat" "python3-flask" "python3-streamlink" ) # pip install not available in bookworm
-pipdeplist=( "streamlink" "flask" ) # list of python package dependencies
-# pipdeplist_bookworm=()
+pkgdeplist=( "vlc-nox" ) # list of dependencies
+pkgdeplist_buster=( "vlc-bin" "vlc-plugin-base" ) # vlc-nox not in buster
 
 FORCE=$1
 ASK_TO_REBOOT=false
@@ -109,7 +106,6 @@ progress() {
     done
     echo
 }
-
 sudocheck() {
     if [ $(id -u) -ne 0 ]; then
         echo -e "Install must be run as root. Try 'sudo ./$scriptname'\n"
@@ -204,16 +200,9 @@ raspbian_check() {
     if [ -f /etc/os-release ]; then
         if cat /etc/os-release | grep -q "/sid"; then
             IS_SUPPORTED=false && IS_EXPERIMENTAL=true
-        # elif cat /etc/os-release | grep -q "bookworm"; then
-        #     IS_SUPPORTED=true && IS_EXPERIMENTAL=false
-        #     pkgdeplist=${pkgdeplist_bookworm[@]}
-        #     pipdeplist=${pipdeplist_bookworm[@]}
-        elif cat /etc/os-release | grep -q "bullseye"; then
-            IS_SUPPORTED=true && IS_EXPERIMENTAL=false
-            pkgdeplist=${pkgdeplist_buster[@]}
         elif cat /etc/os-release | grep -q "buster"; then
             IS_SUPPORTED=true && IS_EXPERIMENTAL=false
-            pkgdeplist=${pkgdeplist_buster[@]}
+	    pkgdeplist=${pkgdeplist_buster[@]}
         elif cat /etc/os-release | grep -q "stretch"; then
             IS_SUPPORTED=false && IS_EXPERIMENTAL=true
         elif cat /etc/os-release | grep -q "jessie"; then
@@ -241,23 +230,6 @@ apt_pkg_req() {
 apt_pkg_install() {
     echo "Installing $1..."
     sudo apt-get --yes install "$1" 1> /dev/null || { inform "Apt failed to install $1!\nFalling back on pypi..." && return 1; }
-}
-
-pip_req() {
-    PIP_CHK=$(sudo pip show "$1" 2>&1 | grep "not found")
-
-    if [ "" == "$PIP_CHK" ]; then
-        echo "$1 is already installed"
-        false
-    else
-        echo "$1 is required"
-        true
-    fi
-}
-
-pip_install() {
-    echo "Installing $1..."
-    sudo pip install "$1" 1> /dev/null || { inform "PIP failed to install $1!\nFalling back on pypi..." && return 1; }
 }
 
 : <<'MAINSTART'
@@ -349,33 +321,19 @@ for pkgdep in ${pkgdeplist[@]}; do
     fi
 done
 
-for pipdep in ${pipdeplist[@]}; do
-    if pip_req "$pipdep"; then
-        pip_install "$pipdep"
-    fi
-done
-
 echo -e "\nInstalling daemon..."
 
 sudo cp ./phatbeatd/etc/init.d/phatbeatd /etc/init.d/
 sudo cp ./phatbeatd/usr/bin/phatbeatd /usr/bin/
-sudo chmod +x /etc/init.d/phatbeatd
 sudo chmod +x /usr/bin/phatbeatd
-
-sudo cp ./phatbeatd/etc/init.d/receiverd /etc/init.d/
-sudo cp ./phatbeatd/usr/bin/receiverd /usr/bin/
-sudo chmod +x /etc/init.d/receiverd
-sudo chmod +x /usr/bin/receiverd
 
 sudo cp ./vlcd/etc/init.d/vlcd /etc/init.d/
 sudo cp ./vlcd/usr/bin/vlcd /usr/bin/
-sudo chmod +x /etc/init.d/vlcd
 sudo chmod +x /usr/bin/vlcd
 
 sudo systemctl daemon-reload
 sudo systemctl enable vlcd
 sudo systemctl enable phatbeatd
-sudo systemctl enable receiverd
 
 echo -e "\nCopying default playlist to /etc/vlcd/"
 sudo mkdir /etc/vlcd &> /dev/null

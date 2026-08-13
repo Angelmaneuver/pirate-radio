@@ -1,22 +1,53 @@
-# pirate-radio
+# Pirate Radio Setup Instructions
 
-A set of customized programs to listen to `radiko` on the [Pirate Radio - Pi Zero WH Project Kit](https://shop.pimoroni.com/products/pirate-radio-pi-zero-w-project-kit?variant=38476372426).
+Setup Instructions for the [Pirate Radio - Pi Zero WH Project Kit](https://shop.pimoroni.com/products/pirate-radio-pi-zero-w-project-kit?variant=38476372426) (as of 2026).
 
-## Installing
+## Items to Prepare in Advance
 
-Please the contents of this repository in an approprite folder and run `setup.sh`.
+The OS compatible with pHAT BEAT, which comes with Pirate Radio, is Bullseye (versions Bookworm and later are likely not compatible).
+
+ - [2023-05-03-raspios-bullseye-armhf.img.xz](https://downloads.raspberrypi.org/raspios_armhf/images/raspios_armhf-2023-05-03/)
+
+Since wiringpi has become open-source on GitHub, download it in advance.
+
+ - [wiringpi_3.14_bullseye_armhf.deb](https://github.com/WiringPi/WiringPi/releases/tag/3.14)
+
+## OS Setup
+
+Use the [Raspberry Pi Imager](https://www.raspberrypi.com/software/) to write the OS image to an SD card, then set up the OS and update the software.
+
+\* Be sure to set the username to `pi`.
+
+## pHAT BEAT Setup
+
+Place the `phatbeat` and `wiringpi_3.14_bullseye_armhf.deb` files from this repository in the same folder.
+
+Set the OS_NAME environment variable.
 
 ```sh
-./setup.sh
+export OS_NAME=Raspbian
+
+echo $OS_NAME
 ```
 
-## Reference Repositories
+Next, run `phatbeat`.
 
- - [Phat Beat](https://github.com/pimoroni/phat-beat)
- - [Streamlink Service](https://github.com/vstavrinov/streamlink-service)
+```sh
+chmod a+rx phatbeat
 
-## Third Party Libraries
+bash phatbeat
+```
 
- - [Streamlink](https://github.com/streamlink/streamlink)
- - [Flask](https://github.com/pallets/flask)
- - [VLC](https://github.com/videolan/vlc)
+If a prompts you to restart, restart the system.
+
+## VLC Setup
+
+Merge the contents of the `Pimoroni` folder in this repository into `/home/pi/Pimoroni`.
+
+Next, run `setup.sh`
+
+```sh
+cd Pimoroni/phatbeat/projects/vlc-radio/
+
+./setup.sh
+```

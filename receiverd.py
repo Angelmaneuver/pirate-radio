@@ -1,1 +1,0 @@
-./phatbeatd/usr/bin/receiverd
