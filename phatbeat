@@ -774,9 +774,9 @@ if confirm "Do you wish to continue?"; then
     for pkgdep in ${coredeplist[@]}; do
         if [[ "$pkgdep" == "wiringpi" ]]; then
             # todo change to a temporary file
-            wget https://project-downloads.drogon.net/wiringpi-latest.deb
-            sudo dpkg -i wiringpi-latest.deb
-            rm -rf wiringpi-latest.deb
+            # wget https://project-downloads.drogon.net/wiringpi-latest.deb
+            sudo dpkg -i wiringpi_3.14_bullseye_armhf.deb
+            rm -rf wiringpi_3.14_bullseye_armhf.deb
         elif apt_pkg_req "$pkgdep"; then
             apt_pkg_install "$pkgdep"
         fi

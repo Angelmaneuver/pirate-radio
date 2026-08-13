@@ -1,33 +1,32 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
-import atexit
-import re
-import socket
-import subprocess
-import time
 import os
+import re
 import signal
+import socket
 import sys
+import time
 from datetime import datetime
 
 VLC_HOST = "127.0.0.1"
 VLC_PORT = 9294
 
-LOG_LEVEL = 0
-
 PIDFILE = "/var/run/phatbeatd.pid"
-LOGFILE = "/var/log/phatbeatd.log"
-ERRFILE = "/var/log/phatbeatd.err"
+LOGFILE = "/var/run/phatbeatd.log"
+ERRFILE = "/var/run/phatbeatd.err"
 
 SHUTDOWN_HOLD_TIME = 3
 
+LOG_LEVEL = 0
+LOG_DEBUG = 3
 LOG_INFO = 0
 LOG_WARN = 1
 LOG_FAIL = 2
-LOG_DEBUG = 3
+
 
 def log(msg, level=LOG_INFO):
-    if level < LOG_LEVEL: return
+    if level < LOG_LEVEL:
+        return
 
     sys.stdout.write(str(datetime.now()))
     sys.stdout.write(": ")
@@ -35,9 +34,9 @@ def log(msg, level=LOG_INFO):
     sys.stdout.write("\n")
     sys.stdout.flush()
 
-class VLC():
 
-    def __init__(self, host="127.0.0.1", port=9294):
+class VLC():
+    def __init__(self, host=VLC_HOST, port=VLC_PORT):
         self.host = host
         self.port = port
         self.current_stream = None
@@ -49,7 +48,7 @@ class VLC():
         if self.connecting:
             return False
 
-        log("Sending command: {}".format(command), level=LOG_INFO)
+        log("Sending command: {}".format(command))
         command_string = command + "\n"
 
         if sys.version_info[0] >= 3:
@@ -59,7 +58,7 @@ class VLC():
             self.socket.send(command_string)
 
         except socket.error:
-            log("Failed to send command to VLC", level=LOG_WARN) 
+            log("Failed to send command to VLC", level=LOG_WARN)
             if self.connect():
                 self.send(command)
 
@@ -79,8 +78,8 @@ class VLC():
         self.send("status")
         status = self.recv(8192)
 
-        result = re.search("input:\ (.*)\ ", status)
-        state = re.search("state\ (.*)\ ", status)
+        result = re.search(r"input:\ (.*)\ ", status)
+        state = re.search(r"state\ (.*)\ ", status)
 
         if state is not None:
             self.current_state = state.group(1)
@@ -105,9 +104,12 @@ class VLC():
 
         for attempt in range(10):
             try:
-                log("Attempting to connect to VLC on {host}:{port}".format(host=self.host, port=self.port))
+                log("Attempting to connect to VLC on {host}:{port}".format(
+                    host=self.host,
+                    port=self.port
+                ))
                 self.socket.connect((self.host, self.port))
-                log("Connection successful!", level=LOG_INFO)
+                log("Connection successful!")
                 self.connecting = False
                 return True
 
@@ -139,9 +141,12 @@ if __name__ == "__main__":
         except OSError:
             pass
 
-        if stdin is not None: stdin.close()
-        if stdout is not None: stdout.close()
-        if stderr is not None: stderr.close()
+        if stdin is not None:
+            stdin.close()
+        if stdout is not None:
+            stdout.close()
+        if stderr is not None:
+            stderr.close()
 
     if daemonize:
         try:
@@ -149,7 +154,7 @@ if __name__ == "__main__":
             if pid > 0:
                 sys.exit(0)
 
-        except OSError, e:
+        except OSError as e:
             log("Fork #1 failed: {} ({})".format(e.errno, e.strerror))
             sys.exit(1)
 
@@ -162,7 +167,7 @@ if __name__ == "__main__":
             if pid > 0:
                 sys.exit(0)
 
-        except OSError, e:
+        except OSError as e:
             log("Fork #2 failed: {} ({})".format(e.errno, e.strerror))
             sys.exit(1)
 
@@ -171,11 +176,14 @@ if __name__ == "__main__":
     fpid.write(str(pid))
     fpid.close()
 
-    log("PHAT BEAT {} running with PID: {}".format("daemon" if daemonize else "process",pid))
+    log("PHAT BEAT {} running with PID: {}".format(
+        "daemon" if daemonize else "process",
+        pid
+    ))
 
-    stdin = file("/dev/null", 'r')
-    stdout = file(LOGFILE, 'a+')
-    stderr = file(ERRFILE, 'a+')
+    stdin = open("/dev/null", 'r')
+    stdout = open(LOGFILE, 'a+')
+    stderr = open(ERRFILE, 'a+')
 
     os.dup2(stdin.fileno(), sys.stdin.fileno())
     os.dup2(stdout.fileno(), sys.stdout.fileno())
@@ -184,8 +192,10 @@ if __name__ == "__main__":
     vlc = VLC(host=VLC_HOST, port=VLC_PORT)
 
     if vlc.connect():
+        import colorsys
         import phatbeat
-        phatbeat.set_all(0,128,0,0.1)
+
+        phatbeat.set_all(0, 128, 0, 0.1)
         phatbeat.show()
         time.sleep(1)
         phatbeat.clear()
@@ -194,6 +204,8 @@ if __name__ == "__main__":
         @phatbeat.on(phatbeat.BTN_VOLDN)
         def pb_volume_down(pin):
             log(vlc.communicate("voldown"))
+            log(vlc.get_current_stream())
+            log(vlc.current_state)
 
         @phatbeat.on(phatbeat.BTN_VOLUP)
         def pb_volume_up(pin):
@@ -217,6 +229,23 @@ if __name__ == "__main__":
         @phatbeat.on(phatbeat.BTN_ONOFF)
         def perform_shutdown(pin):
             log(vlc.communicate("pause"))
+
+            SPEED = 50
+            BRIGHTNESS = 64
+            SPREAD = 20
+
+            for _ in range(50):
+                for x in range(phatbeat.CHANNEL_PIXELS):
+                    h = (time.time() * SPEED + (x * SPREAD)) % 360 / 360.0
+                    r, g, b = [int(c*BRIGHTNESS) for c in colorsys.hsv_to_rgb(h, 1.0, 1.0)]
+                    phatbeat.set_pixel(x, r, g, b, channel=0)
+                    phatbeat.set_pixel(x, r, g, b, channel=1)
+
+                phatbeat.show()
+                time.sleep(0.001)
+
+            phatbeat.clear()
+
             os.system("sudo shutdown -h now")
 
         signal.signal(signal.SIGINT, _signal_handler)

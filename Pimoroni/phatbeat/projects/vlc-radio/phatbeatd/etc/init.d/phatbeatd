@@ -1,8 +1,8 @@
 #! /bin/sh
 ### BEGIN INIT INFO
 # Provides:          phatbeatd
-# Required-Start:    $remote_fs $syslog
-# Required-Stop:     $remote_fs $syslog
+# Required-Start:    $remote_fs $syslog vlcd
+# Required-Stop:     $remote_fs $syslog vlcd
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
 # Short-Description: Starts PHAT BEAT VLC control daemon at boot time
@@ -40,12 +40,7 @@ SCRIPTNAME=/etc/init.d/$NAME
 #
 do_start()
 {
-	if [ -f "$PIDFILE" ] && kill -0 $(cat "$PIDFILE"); then
-		echo 'Service already running' >&2
-		return 1
-	fi
-	echo 'Starting...' >&2
-	su -c "$DAEMON" root
+	start-stop-daemon --start --quiet --pidfile $PIDFILE --exec $DAEMON --background --make-pidfile
 }
 
 #
@@ -53,14 +48,11 @@ do_start()
 #
 do_stop()
 {
-	if [ ! -f "$PIDFILE" ] || ! kill -0 $(cat "$PIDFILE"); then
-		echo 'Service not running' >&2
-		return 1
-	fi
-	echo 'Stopping...' >&2
-	kill $(cat "$PIDFILE")
-	echo 'Service stopped!' >&2
-	return 0
+	start-stop-daemon --stop --quiet --retry=TERM/30/KILL/5 --pidfile $PIDFILE --name $NAME
+	RETVAL="$?"
+	[ "$RETVAL" = 2 ] && return 2
+	rm -f $PIDFILE
+	return "$RETVAL"
 }
 
 case "$1" in

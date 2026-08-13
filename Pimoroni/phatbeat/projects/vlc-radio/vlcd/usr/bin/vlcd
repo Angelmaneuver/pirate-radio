@@ -40,12 +40,17 @@ fi
 --compressor-rms-peak 0.0 \
 --compressor-knee 1.0 \
 --compressor-makeup-gain 0.0 \
+--no-video \
+--network-caching 3000 \
+--clock-jitter 1000 \
+--clock-synchro 0 \
+--drop-late-frames \
+--no-audio-time-stretch \
 --intf dummy \
 --extraintf rc:http \
 --rc-host 0.0.0.0:9294 --rc-fake-tty \
 --http-host 0.0.0.0 --http-port 8080 --http-password raspberry \
---no-quiet \
+--quiet \
 --daemon \
 --pidfile /var/run/vlcd/vlcd.pid \
 $playlist
-

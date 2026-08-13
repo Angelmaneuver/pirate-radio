@@ -200,6 +200,9 @@ raspbian_check() {
     if [ -f /etc/os-release ]; then
         if cat /etc/os-release | grep -q "/sid"; then
             IS_SUPPORTED=false && IS_EXPERIMENTAL=true
+        elif cat /etc/os-release | grep -q "bullseye"; then
+            IS_SUPPORTED=true && IS_EXPERIMENTAL=false
+	    pkgdeplist=${pkgdeplist_buster[@]}
         elif cat /etc/os-release | grep -q "buster"; then
             IS_SUPPORTED=true && IS_EXPERIMENTAL=false
 	    pkgdeplist=${pkgdeplist_buster[@]}
